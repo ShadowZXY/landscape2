@@ -745,22 +745,45 @@ const Explore = (props: Props) => {
                         const label = Object.keys(ClassifyOption)[Object.values(ClassifyOption).indexOf(opt)];
                         return <option value={opt}>{label}</option>;
                       }}
-                    >
-                      <div class={styles.btnSymbol}>-</div>
-                    </button>
-                    <button
-                      title="Decrease zoom level"
-                      class="btn btn-outline-primary rounded-0 fw-semibold"
-                      disabled={zoom() === 10}
-                      onClick={() => {
-                        updateZoom(zoom() + 1);
-                      }}
-                    >
-                      <div class={styles.btnSymbol}>+</div>
-                    </button>
+                    </For>
+                  </select>
+                  <div class={styles.btnGroupLegend}>
+                    <small class="text-muted text-uppercase me-2">Sort:</small>
                   </div>
-                </div>
-              </Show>
+                  <select
+                    id="sorted"
+                    class={`form-select form-select-sm border-primary text-primary rounded-0 ${styles.desktopSelect} ${styles.midSelect}`}
+                    value={`${sorted()}_${sortDirection()}`}
+                    aria-label="Sort"
+                    onChange={(e) => {
+                      const sortValue = e.currentTarget.value;
+                      const sortOpt = sortValue.split('_');
+
+                      batch(() => {
+                        setSorted(sortOpt[0] as SortOption);
+                        setSortDirection(sortOpt[1] as SortDirection);
+                      });
+                      updateQueryString('sort', sortValue);
+                    }}
+                  >
+                    <For each={sortOptions()}>
+                      {(opt: SortOption) => {
+                        return (
+                          <For each={Object.values(SortDirection)}>
+                            {(direction: string) => {
+                              return (
+                                <option value={`${opt}_${direction}`}>
+                                  {SORT_OPTION_LABEL[opt]} ({direction})
+                                </option>
+                              );
+                            }}
+                          </For>
+                        );
+                      }}
+                    </For>
+                  </select>
+                </Match>
+              </Switch>
             </div>
           </div>
           <Show when={!isUndefined(props.initialData.groups)}>
