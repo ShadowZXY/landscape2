@@ -3,7 +3,7 @@ import intersection from 'lodash/intersection';
 import isUndefined from 'lodash/isUndefined';
 import { Accessor, For, Match, Show, Switch } from 'solid-js';
 
-import { COLORS } from '../../../data';
+import { COLORS, GUIDE_PATH } from '../../../data';
 import {
   BaseItem,
   Category,
@@ -93,6 +93,15 @@ const Content = (props: Props) => {
     return subtitles;
   };
 
+  const countItems = (content: { [key: string]: unknown }): number => {
+    let numItems: number = 0;
+    Object.keys(content).forEach((subtitle: string) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      numItems += (content as any)[subtitle].length;
+    });
+    return numItems;
+  };
+
   return (
     <Show when={!isUndefined(data())}>
       <Switch>
@@ -104,13 +113,7 @@ const Content = (props: Props) => {
             {(title: string) => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const content = () => (data() as any)[title] as { [key: string]: unknown } | (BaseItem | Item)[];
-              let numItems: number = 0;
-              if (props.classify === ClassifyOption.Category) {
-                Object.keys(content()).forEach((subtitle: string) => {
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  numItems += (content() as any)[subtitle].length;
-                });
-              }
+              const numItems = () => countItems(content() as { [key: string]: unknown });
 
               return (
                 <div>
@@ -134,7 +137,7 @@ const Content = (props: Props) => {
                                   <Show when={isSectionInGuide(title)}>
                                     <div>
                                       <A
-                                        href={`/guide#${getNormalizedName({ title: title })}`}
+                                        href={`${GUIDE_PATH}#${getNormalizedName({ title: title })}`}
                                         state={{ from: 'explore' }}
                                         class={`position-relative btn btn-link text-white p-0 pe-2 ${styles.btnIcon}`}
                                       >
@@ -143,7 +146,7 @@ const Content = (props: Props) => {
                                     </div>
                                   </Show>
                                   <div class="text-white text-nowrap text-truncate">
-                                    {title} ({numItems})
+                                    {title} ({numItems()})
                                   </div>
                                 </div>
                                 <div
@@ -152,7 +155,7 @@ const Content = (props: Props) => {
                                   <Show when={isSectionInGuide(title, subtitle)}>
                                     <div>
                                       <A
-                                        href={`/guide#${getNormalizedName({ title: title, subtitle: subtitle, grouped: true })}`}
+                                        href={`${GUIDE_PATH}#${getNormalizedName({ title: title, subtitle: subtitle, grouped: true })}`}
                                         state={{ from: 'explore' }}
                                         class={`position-relative btn btn-link p-0 pe-2 ${styles.btnIcon}`}
                                       >

@@ -27,6 +27,7 @@ import FundingRoundsTable from './FundingRoundsTable';
 import ItemDropdown from './ItemDropdown';
 import LanguagesStats from './LanguagesStats';
 import MaturitySection from './MaturitySection';
+import ParentProject from './ParentProject';
 import ParticipationStats from './ParticipationStats';
 
 interface Props {
@@ -79,6 +80,19 @@ const Content = (props: Props) => {
       }
     })
   );
+
+  const getLinkedInUrl = (): string | null => {
+    if (itemInfo()) {
+      if (itemInfo()!.linkedin_url) {
+        return itemInfo()!.linkedin_url!;
+      } else {
+        if (itemInfo()!.crunchbase_data && itemInfo()!.crunchbase_data!.linkedin_url) {
+          return itemInfo()!.crunchbase_data!.linkedin_url!;
+        }
+      }
+    }
+    return null;
+  };
 
   return (
     <>
@@ -184,6 +198,12 @@ const Content = (props: Props) => {
                     </ExternalLink>
                   </Show>
 
+                  <Show when={!isNull(getLinkedInUrl())}>
+                    <ExternalLink title="LinkedIn" class={`ms-3 ${styles.link}`} href={getLinkedInUrl()!}>
+                      <SVGIcon kind={SVGIconKind.LinkedIn} />
+                    </ExternalLink>
+                  </Show>
+
                   <Show when={!isUndefined(itemInfo()!.slack_url)}>
                     <ExternalLink title="Slack" class={`ms-3 ${styles.link}`} href={itemInfo()!.slack_url!}>
                       <SVGIcon kind={SVGIconKind.Slack} />
@@ -281,6 +301,13 @@ const Content = (props: Props) => {
             </For>
           </div>
         </Show>
+        {/* Parent project */}
+        <ParentProject
+          parent={itemInfo()!.parent_project}
+          projectName={itemInfo()!.name}
+          class={styles.fieldset}
+          mobileVersion={false}
+        />
         {/* Maturity */}
         <MaturitySection item={itemInfo()!} class={styles.fieldset} />
         {/* Repositories */}

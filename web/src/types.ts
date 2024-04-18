@@ -1,4 +1,5 @@
 export interface BaseData {
+  base_path?: string;
   finances_available: boolean;
   foundation: string;
   guide_summary?: GuideSummary;
@@ -13,6 +14,7 @@ export interface BaseData {
   members_category?: string;
   qr_code?: string;
   upcoming_event?: Event;
+  view_mode?: ViewMode;
   header?: HeaderContent;
   footer?: FooterContent;
 }
@@ -113,7 +115,9 @@ export interface Item extends BaseItem {
   twitter_url?: string;
   unnamed_organization?: boolean;
   youtube_url?: string;
+  linkedin_url?: string;
   audits?: SecurityAudit[];
+  parent_project?: string;
 }
 
 export interface SecurityAudit {

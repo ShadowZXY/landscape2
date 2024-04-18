@@ -1,7 +1,7 @@
 {
   "name": "embed",
   "private": true,
-  "version": "0.7.0",
+  "version": "0.8.1",
   "type": "module",
   "scripts": {
     "build": "tsc && vite build",
@@ -24,7 +24,6 @@
     "eslint-plugin-solid": "^0.13.1",
     "typescript": "^5.3.3",
     "vite": "^5.1.4",
-    "vite-plugin-solid": "^2.10.1",
-    "vite-plugin-static-copy": "^1.0.1"
+    "vite-plugin-solid": "^2.10.1"
   }
 }

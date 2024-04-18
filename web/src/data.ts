@@ -13,7 +13,17 @@ import {
   ViewMode,
   ZoomLevelsPerSize,
 } from './types';
+import getBasePath from './utils/getBasePath';
 import getFoundationNameLabel from './utils/getFoundationNameLabel';
+
+export const BASE_PATH = getBasePath();
+export const EXPLORE_PATH = BASE_PATH === '' ? '/' : `${BASE_PATH}/`;
+export const EMBED_SETUP_PATH = `${BASE_PATH}/embed-setup`;
+export const STATS_PATH = `${BASE_PATH}/stats`;
+export const GUIDE_PATH = `${BASE_PATH}/guide`;
+export const FINANCES_PATH = `${BASE_PATH}/finances`;
+export const LOGOS_PREVIEW_PATH = `${BASE_PATH}/logos-preview`;
+export const SCREENSHOTS_PATH = '/screenshot';
 
 export const TAB_PARAM = 'tab';
 export const VIEW_MODE_PARAM = 'view-mode';
@@ -47,7 +57,7 @@ export const SMALL_DEVICES_BREAKPOINTS: Breakpoint[] = [Breakpoint.XS, Breakpoin
 export const DEFAULT_STICKY_MOBILE_NAVBAR_HEIGHT = 50;
 export const DEFAULT_STICKY_NAVBAR_HEIGHT = 72;
 export const DEFAULT_TAB = Tab.Explore;
-export const DEFAULT_VIEW_MODE = ViewMode.Grid;
+export const DEFAULT_VIEW_MODE: ViewMode = window.baseDS.view_mode || ViewMode.Grid;
 export const DEFAULT_GRID_ITEMS_SIZE = GridItemsSize.Small;
 export const DEFAULT_FINANCES_KIND = FinancesKind.Funding;
 export const DEFAULT_CLASSIFY = ClassifyOption.Category;
