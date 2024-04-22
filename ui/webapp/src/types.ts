@@ -422,7 +422,6 @@ export enum SVGIconKind {
   Documentation,
   Download,
   Embed,
-  Erlang,
   ExternalLink,
   Facebook,
   Filters,
