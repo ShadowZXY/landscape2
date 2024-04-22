@@ -114,7 +114,6 @@ const Explore = (props: Props) => {
   const [sortOptions, setSortOptions] = createSignal<SortOption[]>(Object.values(SortOption));
   const [numItems, setNumItems] = createSignal<{ [key: string]: number }>({});
   const [licenseOptions, setLicenseOptions] = createSignal<string[]>([]);
-  const activeGroups = () => itemsDataGetter.getGroups();
 
   const checkIfFullDataRequired = (): boolean => {
     if (viewMode() === ViewMode.Card) {

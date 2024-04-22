@@ -555,16 +555,6 @@ export class ItemsDataGetter {
     }
   }
 
-  // Get all end users
-  public getAllEndUserItems(): Item[] | undefined {
-    if (this.ready && this.landscapeData && this.landscapeData.items) {
-      return this.landscapeData.items.filter(
-        (i: Item) =>
-          (i.enduser && window.baseDS.members_category === i.category) || i.subcategory === 'End User Supporter'
-      );
-    }
-  }
-
   // Get maturity options
   public getMaturityOptions(): string[] {
     const maturity = window.baseDS.items.map((i: Item) => i.maturity);
@@ -576,17 +566,15 @@ export class ItemsDataGetter {
     if (this.ready && this.landscapeData && this.landscapeData.items) {
       const allGroupedItems = this.getGroupedData();
       const options: string[] = [];
-      if (!isUndefined(allGroupedItems[group])) {
-        allGroupedItems[group].forEach((i: Item) => {
-          if (i.repositories) {
-            i.repositories.forEach((r: Repository) => {
-              if (r.github_data) {
-                options.push(r.github_data!.license);
-              }
-            });
-          }
-        });
-      }
+      allGroupedItems[group].forEach((i: Item) => {
+        if (i.repositories) {
+          i.repositories.forEach((r: Repository) => {
+            if (r.github_data) {
+              options.push(r.github_data!.license);
+            }
+          });
+        }
+      });
       return uniq(compact(options));
     }
     return [];
