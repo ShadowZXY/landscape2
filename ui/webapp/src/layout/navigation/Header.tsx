@@ -6,7 +6,6 @@ import { createMemo, Show } from 'solid-js';
 import { ALL_OPTION, DEFAULT_VIEW_MODE, EXPLORE_PATH, GUIDE_PATH, SCREENSHOTS_PATH, STATS_PATH } from '../../data';
 import { SVGIconKind } from '../../types';
 import isExploreSection from '../../utils/isExploreSection';
-import itemsDataGetter from '../../utils/itemsDataGetter';
 import prepareLink from '../../utils/prepareLink';
 import scrollToTop from '../../utils/scrollToTop';
 import DownloadDropdown from '../common/DownloadDropdown';
@@ -107,24 +106,22 @@ const Header = (props: Props) => {
               </button>
             </Show>
 
-            <Show when={props.statsVisible}>
-              <button
-                class={`btn btn-link position-relative text-uppercase fw-bold text-decoration-none p-0 ${styles.link}`}
-                classList={{ activeLink: isActive(STATS_PATH) }}
-                onClick={() => {
-                  if (isActive(STATS_PATH)) {
-                    scrollToTop(false);
-                  } else {
-                    navigate(prepareLink(STATS_PATH), {
-                      state: { from: 'header' },
-                    });
-                    scrollToTop(false);
-                  }
-                }}
-              >
-                Stats
-              </button>
-            </Show>
+            <button
+              class={`btn btn-link position-relative text-uppercase fw-bold text-decoration-none p-0 ${styles.link}`}
+              classList={{ activeLink: isActive(STATS_PATH) }}
+              onClick={() => {
+                if (isActive(STATS_PATH)) {
+                  scrollToTop(false);
+                } else {
+                  navigate(prepareLink(STATS_PATH), {
+                    state: { from: 'header' },
+                  });
+                  scrollToTop(false);
+                }
+              }}
+            >
+              Stats
+            </button>
           </div>
 
           <div class={`d-flex flex-row align-items-center ms-auto mt-0 ${styles.searchWrapper}`}>

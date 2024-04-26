@@ -16,7 +16,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: 1.78.0
+          toolchain: 1.77.0
           components: clippy, rustfmt
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
@@ -50,6 +50,7 @@ jobs:
         run: yarn format:diff
       - name: Run eslint
         working-directory: ./ui/webapp
+<<<<<<< HEAD
         run: yarn lint
 
   lint-and-test-embed:
@@ -75,4 +76,6 @@ jobs:
         run: yarn format:diff
       - name: Run eslint
         working-directory: ./ui/embed
+=======
+>>>>>>> c0831bb (Add experimental overlay feature (#587))
         run: yarn lint

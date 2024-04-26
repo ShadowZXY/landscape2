@@ -15,7 +15,7 @@ authors = ["Sergio Castaño Arteaga", "Cintia Sanchez Garcia"]
 homepage = "https://github.com/cncf/landscape2"
 
 [workspace.dependencies]
-anyhow = "1.0.82"
+anyhow = "1.0.81"
 askama = { version = "0.12.1", features = ["serde-json"] }
 askama_escape = { version = "0.10.3", features = ["json"] }
 async-trait = "0.1.80"
@@ -39,7 +39,10 @@ markdown = "1.0.0-alpha.17"
 md-5 = "0.10.6"
 mime_guess = "2.0.4"
 mockall = "0.12.1"
+<<<<<<< HEAD
 mockito = "1.4.0"
+=======
+>>>>>>> c0831bb (Add experimental overlay feature (#587))
 num_cpus = "1.16.0"
 octorust = "0.7.0"
 parse_link_header = "0.3.3"
@@ -48,8 +51,13 @@ qrcode = "0.14.0"
 regex = "1.10.4"
 reqwest = { version = "0.12.4", features = ["json", "native-tls-vendored"] }
 rust-embed = "8.3.0"
+<<<<<<< HEAD
 serde = { version = "1.0.199", features = ["derive"] }
 serde_json = "1.0.116"
+=======
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = "1.0.115"
+>>>>>>> c0831bb (Add experimental overlay feature (#587))
 serde-wasm-bindgen = "0.6.5"
 serde_yaml = "0.9.34"
 sha2 = "0.10.8"

@@ -161,7 +161,6 @@ async fn collect_repository_data(gh: Object<DynGH>, repo_url: &str) -> Result<Re
         }),
         participation_stats,
         stars: gh_repo.stargazers_count,
-        topics: gh_repo.topics,
         url: gh_repo.html_url,
     })
 }

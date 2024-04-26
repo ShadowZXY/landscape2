@@ -17,7 +17,7 @@ const BadgeModal = (props: Props) => {
   const openStatus = () => props.openStatus;
   const origin = window.location.origin;
   const foundation = FOUNDATION;
-  const badgeImage = `https://img.shields.io/badge/${formatShieldsBadgeContent(foundation)}%20Landscape-5699C6`;
+  const badgeImage = `https://img.shields.io/badge/${foundation}%20Landscape-5699C6`;
   const markdownLink = () => `[![${foundation} Landscape](${badgeImage})](${origin}${BASE_PATH}/?item=${itemId()})`;
   const asciiLink = () => `${origin}${BASE_PATH}/?item=${itemId()}[image:${badgeImage}[${foundation} LANDSCAPE]]`;
 

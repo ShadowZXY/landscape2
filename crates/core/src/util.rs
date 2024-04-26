@@ -15,7 +15,7 @@ lazy_static! {
     static ref MULTIPLE_HYPHENS: Regex = Regex::new(r"-{2,}").expect("exprs in MULTIPLE_HYPHENS to be valid");
 
     /// Characters allowed in normalized names.
-    static ref VALID_CHARS: Regex = Regex::new(r#"[a-zA-Z0-9\-_+\u{4e00}-\u{9fa5}]"#).expect("exprs in VALID_CHARS to be valid");
+    static ref VALID_CHARS: Regex = Regex::new(r"[a-z0-9\-\ \+]").expect("exprs in VALID_CHARS to be valid");
 }
 
 /// Normalize category, subcategory and item name.
@@ -82,79 +82,4 @@ pub(crate) fn validate_url(kind: &str, url: &Option<String>) -> Result<()> {
     }
 
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn normalize_name_succeeds() {
-        assert_eq!(normalize_name("Hello World"), "hello-world");
-        assert_eq!(normalize_name("Hello  World"), "hello-world");
-        assert_eq!(normalize_name("Hello.World"), "hello-world");
-        assert_eq!(normalize_name("Hello--World"), "hello-world");
-        assert_eq!(normalize_name("Hello World-"), "hello-world");
-    }
-
-    #[test]
-    fn validate_url_succeeds() {
-        validate_url(
-            "crunchbase",
-            &Some("https://www.crunchbase.com/organization/test".to_string()),
-        )
-        .unwrap();
-
-        for (kind, domain) in &[
-            ("facebook", "facebook.com"),
-            ("flickr", "flickr.com"),
-            ("github", "github.com"),
-            ("instagram", "instagram.com"),
-            ("linkedin", "linkedin.com"),
-            ("stack_overflow", "stackoverflow.com"),
-            ("twitch", "twitch.tv"),
-            ("twitter", "twitter.com"),
-            ("youtube", "youtube.com"),
-        ] {
-            validate_url(kind, &Some(format!("https://{domain}/test"))).unwrap();
-        }
-    }
-
-    #[test]
-    #[should_panic(expected = "relative URL without a base")]
-    fn validate_url_error_parsing() {
-        validate_url("", &Some("invalid url".to_string())).unwrap();
-    }
-
-    #[test]
-    #[should_panic(expected = "invalid scheme")]
-    fn validate_url_invalid_scheme() {
-        validate_url("", &Some("oci://hostname/path".to_string())).unwrap();
-    }
-
-    #[test]
-    #[should_panic(expected = "invalid crunchbase url")]
-    fn validate_url_invalid_crunchbase_url() {
-        validate_url("crunchbase", &Some("https://www.crunchbase.com/test".to_string())).unwrap();
-    }
-
-    #[test]
-    fn validate_url_invalid_domain() {
-        for (kind, domain) in &[
-            ("facebook", "facebook.com"),
-            ("flickr", "flickr.com"),
-            ("github", "github.com"),
-            ("instagram", "instagram.com"),
-            ("linkedin", "linkedin.com"),
-            ("stack_overflow", "stackoverflow.com"),
-            ("twitch", "twitch.tv"),
-            ("twitter", "twitter.com"),
-            ("youtube", "youtube.com"),
-        ] {
-            assert_eq!(
-                validate_url(kind, &Some("https://example.com/test".to_string())).unwrap_err().to_string(),
-                format!("invalid {kind} url: expecting https://{domain}/...")
-            );
-        }
-    }
 }

@@ -5,7 +5,6 @@ import { createContext, createSignal, ParentComponent, useContext } from 'solid-
 
 import { ALL_OPTION, BASE_PATH, GROUP_PARAM } from '../../data';
 import isExploreSection from '../../utils/isExploreSection';
-import itemsDataGetter from '../../utils/itemsDataGetter';
 import prepareLink from '../../utils/prepareLink';
 
 const getInitialGroupName = (groupParam: string | null): string | undefined => {

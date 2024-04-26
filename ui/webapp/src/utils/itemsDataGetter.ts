@@ -92,7 +92,6 @@ export class ItemsDataGetter {
   public init(landscapeData?: LandscapeData) {
     if (!this.ready) {
       if (landscapeData) {
-        this.prepareGroups();
         this.initialDataPreparation(landscapeData);
       } else {
         fetch(import.meta.env.MODE === 'development' ? '../../static/data/full.json' : './data/full.json')
@@ -102,29 +101,6 @@ export class ItemsDataGetter {
           });
       }
     }
-  }
-
-  public prepareGroups() {
-    const groups: string[] = [];
-
-    if (window.baseDS && window.baseDS.groups) {
-      const categories: string[] = [];
-      if (window.baseDS.categories) {
-        window.baseDS.categories.forEach((c: Category) => {
-          categories.push(c.name);
-        });
-      }
-      window.baseDS.groups.forEach((g: Group) => {
-        if (intersection(categories, g.categories).length > 0) {
-          groups.push(g.normalized_name);
-        }
-      });
-      this.groups = groups;
-    }
-  }
-
-  public getGroups(): string[] | undefined {
-    return this.groups;
   }
 
   private initialDataPreparation(data: LandscapeData) {
@@ -566,15 +542,17 @@ export class ItemsDataGetter {
     if (this.ready && this.landscapeData && this.landscapeData.items) {
       const allGroupedItems = this.getGroupedData();
       const options: string[] = [];
-      allGroupedItems[group].forEach((i: Item) => {
-        if (i.repositories) {
-          i.repositories.forEach((r: Repository) => {
-            if (r.github_data) {
-              options.push(r.github_data!.license);
-            }
-          });
-        }
-      });
+      if (!isUndefined(allGroupedItems[group])) {
+        allGroupedItems[group].forEach((i: Item) => {
+          if (i.repositories) {
+            i.repositories.forEach((r: Repository) => {
+              if (r.github_data) {
+                options.push(r.github_data!.license);
+              }
+            });
+          }
+        });
+      }
       return uniq(compact(options));
     }
     return [];
