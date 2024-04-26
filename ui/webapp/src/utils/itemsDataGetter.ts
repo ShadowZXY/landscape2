@@ -538,15 +538,17 @@ export class ItemsDataGetter {
     if (this.ready && this.landscapeData && this.landscapeData.items) {
       const allGroupedItems = this.getGroupedData();
       const options: string[] = [];
-      allGroupedItems[group].forEach((i: Item) => {
-        if (i.repositories) {
-          i.repositories.forEach((r: Repository) => {
-            if (r.github_data) {
-              options.push(r.github_data!.license);
-            }
-          });
-        }
-      });
+      if (!isUndefined(allGroupedItems[group])) {
+        allGroupedItems[group].forEach((i: Item) => {
+          if (i.repositories) {
+            i.repositories.forEach((r: Repository) => {
+              if (r.github_data) {
+                options.push(r.github_data!.license);
+              }
+            });
+          }
+        });
+      }
       return uniq(compact(options));
     }
     return [];
