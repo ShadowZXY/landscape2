@@ -642,25 +642,6 @@ const Explore = (props: Props) => {
                         );
                       }}
                     </For>
-                    <Show when={viewMode() === ViewMode.Card}>
-                      <button
-                        title="All"
-                        class={`btn btn-outline-primary btn-sm rounded-0 fw-semibold text-nowrap ${styles.navLink}`}
-                        classList={{
-                          [`active ${styles.active}`]: !isUndefined(selectedGroup()) && ALL_OPTION === selectedGroup(),
-                        }}
-                        onClick={() => {
-                          setVisibleLoading(true);
-
-                          setTimeout(() => {
-                            setSelectedGroup(ALL_OPTION);
-                            updateQueryString(GROUP_PARAM, ALL_OPTION);
-                          }, DELAY_ACTIONS);
-                        }}
-                      >
-                        All
-                      </button>
-                    </Show>
                   </div>
                 </div>
                 {/* Only visible when btn grouped for groups overflows wrapper */}
@@ -685,9 +666,6 @@ const Explore = (props: Props) => {
                         return <option value={group.normalized_name}>{group.name}</option>;
                       }}
                     </For>
-                    <Show when={viewMode() === ViewMode.Card}>
-                      <option value={ALL_OPTION}>All</option>
-                    </Show>
                   </select>
                 </div>
               </Show>
