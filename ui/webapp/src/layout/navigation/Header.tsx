@@ -6,6 +6,7 @@ import { createMemo, Show } from 'solid-js';
 import { ALL_OPTION, DEFAULT_VIEW_MODE, EXPLORE_PATH, GUIDE_PATH, SCREENSHOTS_PATH, STATS_PATH } from '../../data';
 import { SVGIconKind } from '../../types';
 import isExploreSection from '../../utils/isExploreSection';
+import itemsDataGetter from '../../utils/itemsDataGetter';
 import prepareLink from '../../utils/prepareLink';
 import scrollToTop from '../../utils/scrollToTop';
 import DownloadDropdown from '../common/DownloadDropdown';
