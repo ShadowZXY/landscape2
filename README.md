@@ -1,4 +1,4 @@
-# Landscape2
+git a# Landscape2
 
 **Landscape2** is a tool that generates interactive landscapes websites.
 
@@ -219,7 +219,7 @@ Some examples of it in action (live demos!):
 
 To achieve this, the overlay redoes part of the landscape build process in the browser, reusing the same codebase packed as a WASM module.
 
-The overlay can be enabled by providing any of the following query parameters to the landscape url (they can be combined if needed):
+The overlay can be enabled by providing any of the following query parameters to the landscape url:
 
 - `overlay-data`: *data file url*
 - `overlay-settings`: *settings file url*
