@@ -77,6 +77,18 @@ const MobileDropdown = (props: Props) => {
             </A>
           </div>
         </Show>
+        <Show when={props.statsVisible}>
+          <div class="dropdown-item mb-2">
+            <A
+              class={`btn btn-link position-relative text-uppercase w-100 text-start fw-semibold text-decoration-none p-0 ${styles.link}`}
+              activeClass="activeLink"
+              href={STATS_PATH}
+              onClick={closeDropdown}
+            >
+              Stats
+            </A>
+          </div>
+        </Show>
         <Show
           when={
             !isUndefined(window.baseDS.header) &&
