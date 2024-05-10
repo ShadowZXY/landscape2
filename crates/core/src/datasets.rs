@@ -47,7 +47,7 @@ impl Datasets {
     pub fn new(i: &NewDatasetsInput) -> Self {
         Datasets {
             base: Base::new(i.landscape_data, i.settings, i.guide, i.qr_code),
-            embed: Embed::new(i.landscape_data),
+            embed: Embed::new(i.landscape_data, i.settings),
             full: Full::new(i.landscape_data, i.crunchbase_data, i.github_data),
             stats: Stats::new(i.landscape_data, i.settings),
         }
@@ -252,8 +252,10 @@ pub mod base {
 /// This dataset contains some information about all the embeddable views that
 /// can be generated from the information available in the landscape data.
 pub mod embed {
-    use super::base::Item;
-    use crate::data::{Category, LandscapeData};
+    use crate::{
+        data::{self, AdditionalCategory, Category, LandscapeData},
+        settings::LandscapeSettings,
+    };
     use serde::{Deserialize, Serialize};
     use std::collections::HashMap;
 
@@ -266,18 +268,24 @@ pub mod embed {
 
     impl Embed {
         /// Create a new Embed instance from the data provided.
-        pub fn new(landscape_data: &LandscapeData) -> Self {
+        pub fn new(landscape_data: &LandscapeData, settings: &LandscapeSettings) -> Self {
             let mut views = HashMap::new();
 
             for category in &landscape_data.categories {
                 // Full category view
                 let key = category.normalized_name.clone();
                 let view = EmbedView {
+                    foundation: settings.foundation.clone(),
                     category: category.clone(),
                     items: landscape_data
                         .items
                         .iter()
-                        .filter(|i| i.category == category.name)
+                        .filter(|i| {
+                            i.category == category.name
+                                || i.additional_categories
+                                    .as_ref()
+                                    .map_or(false, |ac| ac.iter().any(|ac| ac.category == category.name))
+                        })
                         .map(Item::from)
                         .collect(),
                 };
@@ -287,6 +295,7 @@ pub mod embed {
                 for subcategory in &category.subcategories {
                     let key = format!("{}--{}", category.normalized_name, subcategory.normalized_name,);
                     let view = EmbedView {
+                        foundation: settings.foundation.clone(),
                         category: Category {
                             name: category.name.clone(),
                             normalized_name: category.normalized_name.clone(),
@@ -295,7 +304,15 @@ pub mod embed {
                         items: landscape_data
                             .items
                             .iter()
-                            .filter(|i| i.category == category.name && i.subcategory == *subcategory.name)
+                            .filter(|i| {
+                                (i.category == category.name && i.subcategory == *subcategory.name)
+                                    || i.additional_categories.as_ref().map_or(false, |ac| {
+                                        ac.iter().any(|ac| {
+                                            ac.category == category.name
+                                                && ac.subcategory == *subcategory.name
+                                        })
+                                    })
+                            })
                             .map(Item::from)
                             .collect(),
                     };
@@ -314,9 +331,58 @@ pub mod embed {
     #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
     pub struct EmbedView {
         pub category: Category,
+        pub foundation: String,
 
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         pub items: Vec<Item>,
+    }
+
+    /// Embed dataset item information.
+    #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+    pub struct Item {
+        pub category: String,
+        pub id: String,
+        pub name: String,
+        pub logo: String,
+        pub subcategory: String,
+        pub website: String,
+
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub additional_categories: Option<Vec<AdditionalCategory>>,
+
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub description: Option<String>,
+
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub maturity: Option<String>,
+
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub member_subcategory: Option<String>,
+
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub organization_name: Option<String>,
+
+        #[serde(skip_serializing_if = "Option::is_none")]
+        pub primary_repository_url: Option<String>,
+    }
+
+    impl From<&data::Item> for Item {
+        fn from(data_item: &data::Item) -> Self {
+            Item {
+                additional_categories: data_item.additional_categories.clone(),
+                category: data_item.category.clone(),
+                description: data_item.description().cloned(),
+                id: data_item.id.clone(),
+                name: data_item.name.clone(),
+                logo: data_item.logo.clone(),
+                maturity: data_item.maturity.clone(),
+                member_subcategory: data_item.member_subcategory.clone(),
+                organization_name: data_item.crunchbase_data.as_ref().and_then(|org| org.name.clone()),
+                primary_repository_url: data_item.primary_repository().map(|r| r.url.clone()),
+                subcategory: data_item.subcategory.clone(),
+                website: data_item.website.clone(),
+            }
+        }
     }
 }
 
@@ -569,6 +635,10 @@ mod tests {
     #[test]
     fn embed_new() {
         let item = data::Item {
+            additional_categories: Some(vec![AdditionalCategory {
+                category: "Category 2".to_string(),
+                subcategory: "Subcategory 2".to_string(),
+            }]),
             category: "Category 1".to_string(),
             homepage_url: "https://homepage.url".to_string(),
             id: "id".to_string(),
@@ -578,19 +648,34 @@ mod tests {
             ..Default::default()
         };
         let landscape_data = LandscapeData {
-            categories: vec![data::Category {
-                name: "Category 1".to_string(),
-                normalized_name: "category-1".to_string(),
-                subcategories: vec![Subcategory {
-                    name: "Subcategory 1".to_string(),
-                    normalized_name: "subcategory-1".to_string(),
-                }],
-            }],
+            categories: vec![
+                data::Category {
+                    name: "Category 1".to_string(),
+                    normalized_name: "category-1".to_string(),
+                    subcategories: vec![Subcategory {
+                        name: "Subcategory 1".to_string(),
+                        normalized_name: "subcategory-1".to_string(),
+                    }],
+                },
+                data::Category {
+                    name: "Category 2".to_string(),
+                    normalized_name: "category-2".to_string(),
+                    subcategories: vec![Subcategory {
+                        name: "Subcategory 2".to_string(),
+                        normalized_name: "subcategory-2".to_string(),
+                    }],
+                },
+            ],
             items: vec![item.clone()],
         };
+        let settings = LandscapeSettings {
+            foundation: "Foundation".to_string(),
+            ..Default::default()
+        };
 
-        let embed = Embed::new(&landscape_data);
-        let expected_embed_view = EmbedView {
+        let embed = Embed::new(&landscape_data, &settings);
+        let expected_embed_view_c1 = EmbedView {
+            foundation: "Foundation".to_string(),
             category: data::Category {
                 name: "Category 1".to_string(),
                 normalized_name: "category-1".to_string(),
@@ -601,15 +686,78 @@ mod tests {
             },
             items: vec![(&item).into()],
         };
+        let expected_embed_view_c2 = EmbedView {
+            foundation: "Foundation".to_string(),
+            category: data::Category {
+                name: "Category 2".to_string(),
+                normalized_name: "category-2".to_string(),
+                subcategories: vec![Subcategory {
+                    name: "Subcategory 2".to_string(),
+                    normalized_name: "subcategory-2".to_string(),
+                }],
+            },
+            items: vec![(&item).into()],
+        };
         let expected_embed = embed::Embed {
             views: vec![
-                ("category-1".to_string(), expected_embed_view.clone()),
-                ("category-1--subcategory-1".to_string(), expected_embed_view),
+                ("category-1".to_string(), expected_embed_view_c1.clone()),
+                ("category-1--subcategory-1".to_string(), expected_embed_view_c1),
+                ("category-2".to_string(), expected_embed_view_c2.clone()),
+                ("category-2--subcategory-2".to_string(), expected_embed_view_c2),
             ]
             .into_iter()
             .collect(),
         };
         pretty_assertions::assert_eq!(embed, expected_embed);
+    }
+
+    #[test]
+    fn embed_item_from_data_item() {
+        let data_item = data::Item {
+            additional_categories: Some(vec![AdditionalCategory {
+                category: "Category 2".to_string(),
+                subcategory: "Subcategory 3".to_string(),
+            }]),
+            category: "Category 1".to_string(),
+            crunchbase_data: Some(Organization {
+                name: Some("Organization".to_string()),
+                ..Default::default()
+            }),
+            description: Some("Description".to_string()),
+            id: "id".to_string(),
+            logo: "logo.svg".to_string(),
+            maturity: Some("graduated".to_string()),
+            member_subcategory: Some("Member subcategory".to_string()),
+            name: "Item".to_string(),
+            repositories: Some(vec![Repository {
+                url: "https://repository.url".to_string(),
+                primary: Some(true),
+                ..Default::default()
+            }]),
+            subcategory: "Subcategory 1".to_string(),
+            website: "https://homepage.url".to_string(),
+            ..Default::default()
+        };
+
+        let item = embed::Item::from(&data_item);
+        let expected_item = embed::Item {
+            additional_categories: Some(vec![AdditionalCategory {
+                category: "Category 2".to_string(),
+                subcategory: "Subcategory 3".to_string(),
+            }]),
+            category: "Category 1".to_string(),
+            description: Some("Description".to_string()),
+            id: "id".to_string(),
+            logo: "logo.svg".to_string(),
+            maturity: Some("graduated".to_string()),
+            member_subcategory: Some("Member subcategory".to_string()),
+            name: "Item".to_string(),
+            organization_name: Some("Organization".to_string()),
+            primary_repository_url: Some("https://repository.url".to_string()),
+            subcategory: "Subcategory 1".to_string(),
+            website: "https://homepage.url".to_string(),
+        };
+        pretty_assertions::assert_eq!(item, expected_item);
     }
 
     #[test]

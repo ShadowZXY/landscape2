@@ -249,7 +249,7 @@ const Searchbar = (props: Props) => {
             when={itemsList()!.length > 0}
             fallback={
               <div class="p-4 text-center fst-italic text-muted">
-                <small>{error() || `我们找不到任何符合条件的内容。`}</small>
+                <small>{error() || `We couldn't find any items that match that criteria.`}</small>
               </div>
             }
           >
