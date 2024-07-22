@@ -32,10 +32,12 @@ export interface Item extends BaseItem {
   devstats_url?: string;
   discord_url?: string;
   docker_url?: string;
+  documentation_url?: string;
   enduser?: boolean;
   github_discussions_url?: string;
   graduated_at?: string;
   incubating_at?: string;
+  archived_at?: string;
   joined_at?: string;
   mailing_list_url?: string;
   package_manager_url?: string;
@@ -161,6 +163,7 @@ export enum SVGIconKind {
   ArrowTop,
   Artwork,
   Blog,
+  Book,
   Calendar,
   CaretDown,
   CaretLeft,
