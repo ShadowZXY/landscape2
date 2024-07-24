@@ -112,32 +112,26 @@ const RepositoryInfo = (props: RepoProps) => {
               <div class="text-truncate">{formatRepoUrl(props.repository.url)}</div>
             </div>
           </ExternalLink>
-          <Show when={props.repository.primary || !isUndefined(props.repository.github_data)}>
-            <div class={`d-flex align-items-center flex-wrap flex-md-nowrap mt-2 mt-md-0 ${Badges}`}>
-              <Show when={props.repository.primary}>
-                <div class={`me-2 badge rounded-0 text-uppercase ${BadgeOutlineDark} ${MiniBadge}`}>Primary</div>
-              </Show>
-              <Show when={!isUndefined(props.repository.github_data)}>
-                <div class={`badge rounded-0 me-2 ${BadgeOutlineDark} ${MiniBadge}`}>
-                  {props.repository.github_data!.license}
-                </div>
-              </Show>
-              <div class="d-none d-md-flex">
-                <ExternalLink
-                  class={`d-flex ${GoodFirstBadge}`}
-                  href={`https://github.com/${formatRepoUrl(
-                    props.repository.url
-                  )}/issues?q=is%3Aopen+is%3Aissue+label%3A"good+first+issue"`}
-                >
-                  <img
-                    src={`https://img.shields.io/github/issues/${formatRepoUrl(
-                      props.repository.url
-                    )}/good%20first%20issue.svg?style=flat-square&label=good%20first%20issues&labelColor=e9ecef&color=6c757d`}
-                  />
-                </ExternalLink>
+          {/* <Show when={props.repository.primary || !isUndefined(props.repository.github_data)}> */}
+          <div class={`d-flex align-items-center flex-wrap flex-md-nowrap mt-2 mt-md-0 ${Badges}`}>
+            {/* <Show when={props.repository.primary}>
+              <div class={`me-2 badge rounded-0 text-uppercase ${BadgeOutlineDark} ${MiniBadge}`}>主仓库</div>
+            </Show> */}
+            <Show when={!isUndefined(props.repository.github_data)}>
+              <div class={`badge rounded-0 me-2 ${BadgeOutlineDark} ${MiniBadge}`}>
+                {props.repository.github_data!.license}
               </div>
+            </Show>
+            <div class="d-none d-md-flex">
+              <ExternalLink
+                class={`d-flex ${GoodFirstBadge}`}
+                href={`https://webide.easystack.io`}
+              >
+                <div class={`me-2 badge rounded-0 text-uppercase ${BadgeOutlineDark} ${MiniBadge}`}>Web IDE</div>
+              </ExternalLink>
             </div>
-          </Show>
+          </div>
+          {/* </Show> */}
         </div>
       </div>
       <Show when={!isUndefined(props.repository.github_data)}>
@@ -216,13 +210,13 @@ export const RepositoriesSection = (props: Props) => {
   return (
     <Show when={repositoriesList().length > 0}>
       <div class={`position-relative ${props.class}`}>
-        <div class={` ${props.titleClass}`}>Repositories</div>
+        <div class={` ${props.titleClass}`}>代码仓库</div>
 
         <select
           id="repo-select"
           class={`form-select form-select-md border-0 rounded-0 my-3 ${Select}`}
           value={selectedRepo() ? selectedRepo()!.url : undefined}
-          aria-label="Repository select"
+          aria-label="选择"
           onChange={(e) => {
             const repo = repositoriesList().find((r) => r.url === e.currentTarget.value);
             setSelectedRepo(repo);
@@ -233,7 +227,7 @@ export const RepositoriesSection = (props: Props) => {
               return (
                 <option value={repo.url}>
                   {formatRepoUrl(repo.url)}
-                  <Show when={repo.primary}> (primary)</Show>
+                  {/* <Show when={repo.primary}> (主要)</Show> */}
                 </option>
               );
             }}
