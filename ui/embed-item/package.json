@@ -1,7 +1,7 @@
 {
   "name": "embed-item",
   "private": true,
-  "version": "0.9.0",
+  "version": "0.10.0",
   "type": "module",
   "scripts": {
     "build": "tsc && vite build",
@@ -15,7 +15,7 @@
   "dependencies": {
     "@solid-primitives/resize-observer": "^2.0.25",
     "bootstrap": "^5.3.3",
-    "common": "file:../common",
+    "common": "link:../common",
     "solid-js": "^1.8.17",
     "solid-styled-components": "^0.28.5"
   },

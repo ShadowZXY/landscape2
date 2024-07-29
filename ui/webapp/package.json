@@ -1,7 +1,7 @@
 {
   "name": "landscape",
   "private": true,
-  "version": "0.9.0",
+  "version": "0.10.0",
   "type": "module",
   "scripts": {
     "build": "tsc && vite build",
@@ -20,7 +20,7 @@
     "add": "^2.0.6",
     "apexcharts": "^3.49.1",
     "bootstrap": "^5.3.3",
-    "common": "file:../common",
+    "common": "link:../common",
     "lodash": "^4.17.21",
     "minisearch": "^6.3.0",
     "moment": "^2.30.1",
