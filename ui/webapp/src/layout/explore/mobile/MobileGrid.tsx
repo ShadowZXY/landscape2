@@ -22,6 +22,7 @@ const MobileGrid = (props: Props) => {
 
   return (
     <div
+      role="list"
       class={styles.items}
       style={
         isMobile()
@@ -48,6 +49,7 @@ const MobileGrid = (props: Props) => {
             {(item: BaseItem | Item) => {
               return (
                 <div
+                  role="listitem"
                   style={item.featured && item.featured.label ? { border: `2px solid ${props.bgColor}` } : {}}
                   class={`card rounded-0 position-relative p-0 ${styles.card}`}
                   classList={{
@@ -61,6 +63,7 @@ const MobileGrid = (props: Props) => {
                       e.preventDefault();
                       updateActiveItemId(item.id);
                     }}
+                    aria-label={`Open ${item.name} info`}
                   >
                     <Image name={item.name} class={`m-auto ${styles.logo}`} logo={item.logo} enableLazyLoad />
                   </button>

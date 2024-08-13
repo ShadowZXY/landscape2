@@ -578,6 +578,7 @@ const Explore = (props: Props) => {
                 class={`position-relative btn btn-sm btn-secondary text-white btn-sm rounded-0 py-0 me-1 me-lg-4 btnIconMobile ${styles.mobileToCBtn}`}
                 onClick={() => setOpenMenuStatus(true)}
                 disabled={numVisibleItems() === 0 || classify() === ClassifyOption.None}
+                aria-label="Open Table of contents"
               >
                 <SVGIcon kind={SVGIconKind.ToC} />
               </button>
@@ -638,12 +639,33 @@ const Explore = (props: Props) => {
                                 updateQueryString(GROUP_PARAM, group.normalized_name);
                               }, DELAY_ACTIONS);
                             }}
+                            aria-label={group.name}
                           >
                             {group.name}
                           </button>
                         );
                       }}
                     </For>
+                    <Show when={viewMode() === ViewMode.Card}>
+                      <button
+                        title="All"
+                        class={`btn btn-outline-primary btn-sm rounded-0 fw-semibold text-nowrap ${styles.navLink}`}
+                        classList={{
+                          [`active ${styles.active}`]: !isUndefined(selectedGroup()) && ALL_OPTION === selectedGroup(),
+                        }}
+                        onClick={() => {
+                          setVisibleLoading(true);
+
+                          setTimeout(() => {
+                            setSelectedGroup(ALL_OPTION);
+                            updateQueryString(GROUP_PARAM, ALL_OPTION);
+                          }, DELAY_ACTIONS);
+                        }}
+                        aria-label="All"
+                      >
+                        All
+                      </button>
+                    </Show>
                   </div>
                 </div>
                 {/* Only visible when btn grouped for groups overflows wrapper */}
@@ -652,7 +674,7 @@ const Explore = (props: Props) => {
                     id="desktop-group"
                     class={`form-select form-select-sm border-primary text-primary rounded-0 me-4 ${styles.desktopSelect}`}
                     value={selectedGroup()}
-                    aria-label="Group"
+                    aria-label="Groups list"
                     onChange={(e) => {
                       setVisibleLoading(true);
                       const group = e.currentTarget.value;
@@ -719,6 +741,7 @@ const Explore = (props: Props) => {
                           }, DELAY_ACTIONS);
                         }
                       }}
+                      aria-label={`Change view mode to ${mode}`}
                     >
                       {buttonText}
                     </button>
@@ -741,6 +764,7 @@ const Explore = (props: Props) => {
                         onClick={() => {
                           updateZoom(zoom() - 1);
                         }}
+                        aria-label="Decrease zoom level"
                       >
                         <div class={styles.btnSymbol}>-</div>
                       </button>
@@ -751,6 +775,7 @@ const Explore = (props: Props) => {
                         onClick={() => {
                           updateZoom(zoom() + 1);
                         }}
+                        aria-label="Increase zoom level"
                       >
                         <div class={styles.btnSymbol}>+</div>
                       </button>
@@ -765,7 +790,7 @@ const Explore = (props: Props) => {
                     id="classify"
                     class={`form-select form-select-sm border-primary text-primary rounded-0 me-4 ${styles.desktopSelect} ${styles.miniSelect}`}
                     value={classify()}
-                    aria-label="Classify"
+                    aria-label="Classify options"
                     onChange={(e) => {
                       setVisibleLoading(true);
                       const classifyOpt = e.currentTarget.value as ClassifyOption;
@@ -790,7 +815,7 @@ const Explore = (props: Props) => {
                     id="sorted"
                     class={`form-select form-select-sm border-primary text-primary rounded-0 ${styles.desktopSelect} ${styles.midSelect}`}
                     value={`${sorted()}_${sortDirection()}`}
-                    aria-label="Sort"
+                    aria-label="Sort options"
                     onChange={(e) => {
                       setVisibleLoading(true);
                       const sortValue = e.currentTarget.value;
@@ -841,7 +866,7 @@ const Explore = (props: Props) => {
                 id="mobile-group"
                 class={`form-select form-select-md border-0 rounded-0 ${styles.select}`}
                 value={selectedGroup() || props.initialData.groups![0].normalized_name}
-                aria-label="Group"
+                aria-label="Groups list"
                 onChange={(e) => {
                   setVisibleLoading(true);
                   const group = e.currentTarget.value;
