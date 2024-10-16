@@ -208,6 +208,9 @@ pub(crate) struct Item {
     pub additional_categories: Option<Vec<AdditionalCategory>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub annotations: Option<HashMap<String, String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub archived_at: Option<NaiveDate>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -259,6 +262,12 @@ pub(crate) struct Item {
     pub joined_at: Option<NaiveDate>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub latest_annual_review_at: Option<NaiveDate>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub latest_annual_review_url: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub mailing_list_url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -304,6 +313,7 @@ impl Item {
         Self {
             accepted_at: item.accepted_at,
             additional_categories: item.additional_categories.clone(),
+            annotations: item.annotations.clone(),
             archived_at: item.archived_at,
             artwork_url: item.artwork_url.clone(),
             audits: item.audits.clone(),
@@ -324,6 +334,8 @@ impl Item {
             id: item.id.clone(),
             incubating_at: item.incubating_at,
             joined_at: item.joined_at,
+            latest_annual_review_at: item.latest_annual_review_at,
+            latest_annual_review_url: item.latest_annual_review_url.clone(),
             logo_url: format!(
                 "{}/{}",
                 landscape_url.strip_suffix('/').unwrap_or(landscape_url),
