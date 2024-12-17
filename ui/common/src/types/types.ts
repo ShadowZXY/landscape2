@@ -44,6 +44,8 @@ export interface Item extends BaseItem {
   latest_annual_review_at?: string;
   latest_annual_review_url?: string;
   openssf_best_practices_url?: string;
+  pinterest_url?: string;
+  reddit_url?: string;
   repositories?: Repository[];
   slack_url?: string;
   specification?: boolean;
@@ -189,6 +191,7 @@ export enum SVGIconKind {
   Filters,
   Flickr,
   Flutter,
+  Forums,
   Games,
   GitHub,
   GitHubCircle,
@@ -209,10 +212,12 @@ export enum SVGIconKind {
   Packagist,
   PDF,
   Perl,
+  Pinterest,
   Play,
   PNG,
   PyPi,
   Quiz,
+  Reddit,
   RubyGems,
   Rust,
   Search,

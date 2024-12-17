@@ -161,6 +161,7 @@ pub(super) struct ItemExtra {
     pub discord_url: Option<String>,
     pub docker_url: Option<String>,
     pub documentation_url: Option<String>,
+    pub facebook_url: Option<String>,
     pub github_discussions_url: Option<String>,
     pub gitter_url: Option<String>,
     pub graduated: Option<NaiveDate>,
@@ -170,6 +171,8 @@ pub(super) struct ItemExtra {
     pub other_links: Option<Vec<ItemLink>>,
     pub package_manager_url: Option<String>,
     pub parent_project: Option<String>,
+    pub pinterest_url: Option<String>,
+    pub reddit_url: Option<String>,
     pub slack_url: Option<String>,
     pub specification: Option<bool>,
     pub stack_overflow_url: Option<String>,
@@ -206,14 +209,14 @@ fn validate_urls(item: &Item) -> Result<()> {
         ("twitter", &item.twitter),
     ];
     for (name, url) in urls {
-        validate_url(name, url)?;
+        validate_url(name, url.as_ref())?;
     }
 
     // Check additional repositories
     if let Some(additional_repos) = &item.additional_repos {
         for r in additional_repos {
             let repo_url = Some(r.repo_url.clone());
-            validate_url("additional_repository", &repo_url)?;
+            validate_url("additional_repository", repo_url.as_ref())?;
         }
     }
 
@@ -227,24 +230,27 @@ fn validate_urls(item: &Item) -> Result<()> {
             ("discord", &extra.discord_url),
             ("docker", &extra.docker_url),
             ("documentation", &extra.documentation_url),
+            ("facebook", &extra.facebook_url),
             ("github_discussions", &extra.github_discussions_url),
             ("gitter", &extra.gitter_url),
             ("linkedin", &extra.linkedin_url),
-            ("package_manager", &extra.package_manager_url),
             ("mailing_list", &extra.mailing_list_url),
+            ("package_manager", &extra.package_manager_url),
+            ("pinterest", &extra.pinterest_url),
+            ("reddit", &extra.reddit_url),
             ("slack", &extra.slack_url),
             ("stack_overflow", &extra.stack_overflow_url),
             ("youtube", &extra.youtube_url),
         ];
         for (name, url) in urls {
-            validate_url(name, url)?;
+            validate_url(name, url.as_ref())?;
         }
 
         // Check audits urls
         if let Some(audits) = &extra.audits {
             for a in audits {
                 let audit_url = Some(a.url.clone());
-                validate_url("audit", &audit_url)?;
+                validate_url("audit", audit_url.as_ref())?;
             }
         }
 
@@ -252,7 +258,7 @@ fn validate_urls(item: &Item) -> Result<()> {
         if let Some(other_links) = &extra.other_links {
             for link in other_links {
                 let link_url = Some(link.url.clone());
-                validate_url("other_link", &link_url)?;
+                validate_url("other_link", link_url.as_ref())?;
             }
         }
     };

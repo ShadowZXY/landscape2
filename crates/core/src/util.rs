@@ -40,7 +40,7 @@ pub(crate) fn normalize_name(value: &str) -> String {
 }
 
 /// Validate the url provided.
-pub(crate) fn validate_url(kind: &str, url: &Option<String>) -> Result<()> {
+pub(crate) fn validate_url(kind: &str, url: Option<&String>) -> Result<()> {
     if let Some(url) = url {
         let invalid_url = |reason: &str| bail!("invalid {kind} url: {reason}");
 
@@ -75,6 +75,8 @@ pub(crate) fn validate_url(kind: &str, url: &Option<String>) -> Result<()> {
             "github" => return check_domains(&["github.com"]),
             "instagram" => return check_domains(&["instagram.com"]),
             "linkedin" => return check_domains(&["linkedin.com"]),
+            "pinterest" => return check_domains(&["pinterest.com"]),
+            "reddit" => return check_domains(&["reddit.com"]),
             "stack_overflow" => return check_domains(&["stackoverflow.com"]),
             "twitch" => return check_domains(&["twitch.tv"]),
             "twitter" => return check_domains(&["twitter.com", "x.com"]),
@@ -103,7 +105,7 @@ mod tests {
     fn validate_url_succeeds() {
         validate_url(
             "crunchbase",
-            &Some("https://www.crunchbase.com/organization/test".to_string()),
+            Some("https://www.crunchbase.com/organization/test".to_string()).as_ref(),
         )
         .unwrap();
 
@@ -119,26 +121,30 @@ mod tests {
             ("twitter", "x.com"),
             ("youtube", "youtube.com"),
         ] {
-            validate_url(kind, &Some(format!("https://{domain}/test"))).unwrap();
+            validate_url(kind, Some(format!("https://{domain}/test")).as_ref()).unwrap();
         }
     }
 
     #[test]
     #[should_panic(expected = "relative URL without a base")]
     fn validate_url_error_parsing() {
-        validate_url("", &Some("invalid url".to_string())).unwrap();
+        validate_url("", Some("invalid url".to_string()).as_ref()).unwrap();
     }
 
     #[test]
     #[should_panic(expected = "invalid scheme")]
     fn validate_url_invalid_scheme() {
-        validate_url("", &Some("oci://hostname/path".to_string())).unwrap();
+        validate_url("", Some("oci://hostname/path".to_string()).as_ref()).unwrap();
     }
 
     #[test]
     #[should_panic(expected = "invalid crunchbase url")]
     fn validate_url_invalid_crunchbase_url() {
-        validate_url("crunchbase", &Some("https://www.crunchbase.com/test".to_string())).unwrap();
+        validate_url(
+            "crunchbase",
+            Some("https://www.crunchbase.com/test".to_string()).as_ref(),
+        )
+        .unwrap();
     }
 
     #[test]
@@ -155,7 +161,7 @@ mod tests {
             "twitter",
             "youtube",
         ] {
-            let error = validate_url(kind, &Some(url.clone())).unwrap_err().to_string();
+            let error = validate_url(kind, Some(url.clone()).as_ref()).unwrap_err().to_string();
             let expected_error = format!("invalid {kind} url");
             assert!(error.starts_with(expected_error.as_str()));
         }
