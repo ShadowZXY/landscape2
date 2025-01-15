@@ -77,7 +77,7 @@ export interface BaseItem {
   description?: string;
   featured?: Featured;
   maturity?: string;
-  tag?: string;
+  tag?: string[];
   additional_categories?: AdditionalCategory[];
 }
 
@@ -461,7 +461,7 @@ export enum ClassifyOption {
   None = 'none',
   Category = 'category',
   Maturity = 'maturity',
-  Tag = 'tag',
+  TAG = 'tag',
 }
 
 export enum SortOption {
