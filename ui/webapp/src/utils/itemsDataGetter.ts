@@ -165,29 +165,46 @@ export class ItemsDataGetter {
   }
 
   // Get categories and subcategories list with items
-  public getCategoriesAndSubcategoriesList(): Category[] {
-    const list: { [key: string]: string[] } = {};
+  public getCategoriesAndSubcategoriesWithItems(): Category[] {
+    const categoriesToKeep: { [key: string]: string[] } = {};
     window.baseDS.items.forEach((i: Item) => {
-      if (list[i.category]) {
-        list[i.category].push(i.subcategory);
+      if (categoriesToKeep[i.category]) {
+        if (!categoriesToKeep[i.category].includes(i.subcategory)) {
+          categoriesToKeep[i.category].push(i.subcategory);
+        }
       } else {
-        list[i.category] = [i.subcategory];
+        categoriesToKeep[i.category] = [i.subcategory];
       }
-    });
-    const categories: Category[] = [];
-    window.baseDS.categories.forEach((c: Category) => {
-      if (list[c.name]) {
-        const subcategories: Subcategory[] = [];
-        c.subcategories.forEach((s: Subcategory) => {
-          if (list[c.name].includes(s.name)) {
-            subcategories.push(s);
+      // Add additional categories
+      if (i.additional_categories) {
+        i.additional_categories.forEach((ac: AdditionalCategory) => {
+          if (categoriesToKeep[ac.category]) {
+            if (!categoriesToKeep[ac.category].includes(ac.subcategory)) {
+              categoriesToKeep[ac.category].push(ac.subcategory);
+            }
+          } else {
+            categoriesToKeep[ac.category] = [ac.subcategory];
           }
         });
-        categories.push({ ...c, subcategories: subcategories });
       }
     });
 
-    return categories;
+    const categoriesWithItems: Category[] = [];
+    window.baseDS.categories.forEach((c: Category) => {
+      // Check if the category is in the list of valid categories
+      // and if it has subcategories
+      if (categoriesToKeep[c.name] && c.subcategories.length > 0) {
+        const subcategoriesWithItems: Subcategory[] = [];
+        c.subcategories.forEach((s: Subcategory) => {
+          if (categoriesToKeep[c.name].includes(s.name)) {
+            subcategoriesWithItems.push(s);
+          }
+        });
+        categoriesWithItems.push({ ...c, subcategories: subcategoriesWithItems });
+      }
+    });
+
+    return categoriesWithItems;
   }
 
   // Extend items with crunchbase and github data
