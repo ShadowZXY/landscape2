@@ -710,7 +710,7 @@ async fn prepare_screenshot(width: u32, output_dir: &Path) -> Result<()> {
     });
 
     // Setup headless browser and navigate to screenshot url
-    const TIMEOUT: Duration = Duration::from_secs(300);
+    const TIMEOUT: Duration = Duration::from_secs(600);
     let options = LaunchOptions {
         args: vec![
             OsStr::new("--force-device-scale-factor=2"),
@@ -737,6 +737,7 @@ async fn prepare_screenshot(width: u32, output_dir: &Path) -> Result<()> {
             clip: None,
             from_surface: None,
             capture_beyond_viewport: Some(true),
+            optimize_for_speed: None,
         })
         .context("error generating screenshot in png format")?
         .data;

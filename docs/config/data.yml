@@ -115,7 +115,7 @@ categories:
               # items that represent a foundation's project. Format: 'YYYY-MM-DD'.
               archived: "2020-05-14"
 
-              # List of security audits the projet has undergone (optional). The structure for
+              # List of security audits the project has undergone (optional). The structure for
               # each audit is as follows:
               #
               # audits:
@@ -143,6 +143,9 @@ categories:
 
               # Blog URL (optional).
               blog_url: https://blog.url
+
+              # Bluesky URL (optional).
+              bluesky_url: https://https://bsky.app/profile/you.com
 
               # Channel to discuss topics related to this item (optional).
               chat_channel: "#channel"
