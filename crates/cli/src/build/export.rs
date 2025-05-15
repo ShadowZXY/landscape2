@@ -1,12 +1,15 @@
 //! This module defines the functionality to generate the `items.csv`
 //! file from the information available in the landscape.
 
-use super::{data, LandscapeData};
-use crate::build::data::DATE_FORMAT;
+use std::fs::File;
+
 use anyhow::Result;
 use chrono::NaiveDate;
 use serde::Serialize;
-use std::fs::File;
+
+use crate::build::data::DATE_FORMAT;
+
+use super::{data, LandscapeData};
 
 /// Item information used for each record in the CSV file.
 ///
@@ -67,6 +70,7 @@ struct Item {
 }
 
 impl From<&data::Item> for Item {
+    #[allow(clippy::too_many_lines)]
     fn from(di: &data::Item) -> Self {
         // Helper closure to format dates
         let fmt_date = |date: NaiveDate| date.format(DATE_FORMAT).to_string();
@@ -131,8 +135,10 @@ impl From<&data::Item> for Item {
             item.tag = Some(tags.join(","));
         }
 
-        // GitHub values
+        // Primary repository and GitHub data
         if let Some(repo) = di.primary_repository() {
+            item.license.clone_from(&repo.license); // License override
+
             if let Some(gh_data) = &repo.github_data {
                 item.github_contributors_count = Some(gh_data.contributors.count);
                 item.github_contributors_link = Some(gh_data.contributors.url.clone());
@@ -160,8 +166,10 @@ impl From<&data::Item> for Item {
                     item.github_latest_release_link = Some(release.url.clone());
                 }
 
-                if let Some(license) = &gh_data.license {
-                    item.license = Some(license.clone());
+                if item.license.is_none() {
+                    if let Some(license) = &gh_data.license {
+                        item.license = Some(license.clone());
+                    }
                 }
             }
         }

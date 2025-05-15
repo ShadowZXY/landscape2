@@ -1,19 +1,20 @@
 //! This module defines some types used to parse the landscape data file in
 //! legacy format and convert it to the new one.
 
-use super::{ItemAudit, ItemLink};
-use crate::util::validate_url;
+use std::{collections::HashMap, sync::LazyLock};
+
 use anyhow::{bail, format_err, Context, Result};
 use chrono::NaiveDate;
-use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
-lazy_static! {
-    /// TAG name regular expression.
-    static ref TAG_NAME: Regex = Regex::new(r"^[a-z\-]+$").expect("exprs in TAG_NAME to be valid");
-}
+use crate::util::validate_url;
+
+use super::{ItemAudit, ItemLink};
+
+/// TAG name regular expression.
+static TAG_NAME: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^[a-z\-]+$").expect("exprs in TAG_NAME to be valid"));
 
 /// Landscape data (legacy format).
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
@@ -138,6 +139,7 @@ pub(super) struct Item {
     pub enduser: Option<bool>,
     pub extra: Option<ItemExtra>,
     pub joined: Option<NaiveDate>,
+    pub license: Option<String>,
     pub project: Option<String>,
     pub repo_url: Option<String>,
     pub second_path: Option<Vec<String>>,
@@ -198,6 +200,7 @@ pub(super) struct ItemExtra {
 pub(super) struct Repository {
     pub repo_url: String,
     pub branch: Option<String>,
+    pub license: Option<String>,
 }
 
 /// Validate the urls of the item provided.
@@ -265,7 +268,7 @@ fn validate_urls(item: &Item) -> Result<()> {
                 validate_url("other_link", link_url.as_ref())?;
             }
         }
-    };
+    }
 
     Ok(())
 }

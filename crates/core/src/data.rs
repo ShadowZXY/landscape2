@@ -7,19 +7,22 @@
 //! backwards compatibility, this module provides a `legacy` submodule that
 //! allows parsing the legacy format and convert it to the new one.
 
-use super::settings::{self, LandscapeSettings};
-use crate::util::normalize_name;
-use anyhow::{bail, Context, Result};
-use chrono::{DateTime, NaiveDate, Utc};
-use clap::Args;
-use reqwest::StatusCode;
-use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, HashMap},
     fs,
     path::{Path, PathBuf},
 };
+
+use anyhow::{bail, Context, Result};
+use chrono::{DateTime, NaiveDate, Utc};
+use clap::Args;
+use reqwest::StatusCode;
+use serde::{Deserialize, Serialize};
 use tracing::{debug, instrument, warn};
+
+use crate::util::normalize_name;
+
+use super::settings::{self, LandscapeSettings};
 
 mod legacy;
 
@@ -84,13 +87,13 @@ impl LandscapeData {
         if let Some(file) = &src.data_file {
             debug!(?file, "getting landscape data from file");
             return LandscapeData::new_from_file(file);
-        };
+        }
 
         // Try from url
         if let Some(url) = &src.data_url {
             debug!(?url, "getting landscape data from url");
             return LandscapeData::new_from_url(url).await;
-        };
+        }
 
         bail!("data file or url not provided");
     }
@@ -195,13 +198,11 @@ impl LandscapeData {
             }
 
             // Set item's oss field
-            if item
-                .primary_repository()
-                .and_then(|repo| repo.github_data.as_ref())
-                .and_then(|gh_data| gh_data.license.as_ref())
-                .is_some()
-            {
-                item.oss = Some(true);
+            if let Some(repo) = item.primary_repository() {
+                if repo.license.is_some() || repo.github_data.as_ref().is_some_and(|gh| gh.license.is_some())
+                {
+                    item.oss = Some(true);
+                }
             }
         }
     }
@@ -395,6 +396,7 @@ impl From<legacy::LandscapeData> for LandscapeData {
                             url,
                             branch: legacy_item.branch,
                             github_data: None,
+                            license: legacy_item.license,
                             primary: Some(true),
                         });
                     }
@@ -404,6 +406,7 @@ impl From<legacy::LandscapeData> for LandscapeData {
                                 url: entry.repo_url,
                                 branch: entry.branch,
                                 github_data: None,
+                                license: entry.license,
                                 primary: Some(false),
                             });
                         }
@@ -929,6 +932,9 @@ pub struct Repository {
     pub github_data: Option<RepositoryGithubData>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub license: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub primary: Option<bool>,
 }
 
@@ -960,8 +966,9 @@ pub struct RepositoryGithubData {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::settings::{EndUserRule, FeaturedItemRule, FeaturedItemRuleOption, TagRule};
+
+    use super::*;
 
     const DATA_FILE: &str = "data.yml";
     const TESTS_DATA_FILE: &str = "src/testdata/data.yml";
@@ -1372,6 +1379,7 @@ mod tests {
                         additional_repos: Some(vec![legacy::Repository {
                             repo_url: "additional_repo_url".to_string(),
                             branch: Some("branch".to_string()),
+                            license: Some("license".to_string()),
                         }]),
                         branch: Some("branch".to_string()),
                         crunchbase: Some("crunchbase_url".to_string()),
@@ -1430,6 +1438,7 @@ mod tests {
                             youtube_url: Some("youtube_url".to_string()),
                         }),
                         joined: Some(date),
+                        license: Some("license".to_string()),
                         project: Some("graduated".to_string()),
                         repo_url: Some("repo_url".to_string()),
                         second_path: Some(vec!["category2 / subcategory2.1".to_string()]),
@@ -1512,12 +1521,14 @@ mod tests {
                         url: "repo_url".to_string(),
                         branch: Some("branch".to_string()),
                         github_data: None,
+                        license: Some("license".to_string()),
                         primary: Some(true),
                     },
                     Repository {
                         url: "additional_repo_url".to_string(),
                         branch: Some("branch".to_string()),
                         github_data: None,
+                        license: Some("license".to_string()),
                         primary: Some(false),
                     },
                 ]),

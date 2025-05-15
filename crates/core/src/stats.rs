@@ -1,15 +1,18 @@
 //! This module defines some types used to represent the some landscape stats,
 //! as well as the functionality used to prepare them.
 
+use std::collections::{BTreeMap, HashSet};
+
+use chrono::{Datelike, Utc};
+use itertools::Itertools;
+use serde::{Deserialize, Serialize};
+
+use crate::data::LandscapeData;
+
 use super::{
     data::{CategoryName, SubcategoryName},
     settings::{LandscapeSettings, TagName},
 };
-use crate::data::LandscapeData;
-use chrono::{Datelike, Utc};
-use itertools::Itertools;
-use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, HashSet};
 
 /// Format used to represent a date as year-month.
 pub const YEAR_MONTH_FORMAT: &str = "%Y-%m";
@@ -382,6 +385,13 @@ impl RepositoriesStats {
                     // Number of repositories
                     stats.repositories += 1;
 
+                    // Licenses
+                    let mut license_overriden = false;
+                    if let Some(license) = &repo.license {
+                        license_overriden = true;
+                        increment(&mut stats.licenses, license, 1);
+                    }
+
                     if let Some(gh_data) = &repo.github_data {
                         // Contributors
                         stats.contributors += gh_data.contributors.count as u64;
@@ -401,8 +411,10 @@ impl RepositoriesStats {
                         }
 
                         // Licenses
-                        if let Some(license) = &gh_data.license {
-                            increment(&mut stats.licenses, license, 1);
+                        if !license_overriden {
+                            if let Some(license) = &gh_data.license {
+                                increment(&mut stats.licenses, license, 1);
+                            }
                         }
 
                         // Participation stats
@@ -488,12 +500,14 @@ fn calculate_running_total(map: &BTreeMap<YearMonth, u64>) -> BTreeMap<YearMonth
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use chrono::NaiveDate;
+
     use crate::data::{
         Acquisition, Contributors, FundingRound, Item, ItemAudit, Organization, Repository,
         RepositoryGithubData,
     };
-    use chrono::NaiveDate;
+
+    use super::*;
 
     #[test]
     fn stats_new() {
@@ -757,6 +771,7 @@ mod tests {
                     name: "Project 2".to_string(),
                     repositories: Some(vec![
                         Repository {
+                            license: Some("MIT".to_string()),
                             url: "https://repository2.url".to_string(),
                             github_data: Some(RepositoryGithubData {
                                 contributors: Contributors {
@@ -779,7 +794,7 @@ mod tests {
                                     .into_iter()
                                     .collect(),
                                 ),
-                                license: Some("MIT".to_string()),
+                                license: Some("Apache-2.0".to_string()),
                                 participation_stats: vec![4, 5, 6],
                                 stars: 20,
                                 ..Default::default()

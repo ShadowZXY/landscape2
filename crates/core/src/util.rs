@@ -1,18 +1,20 @@
 //! This module provides some utility functions.
 
+use std::sync::LazyLock;
+
 use anyhow::{bail, Result};
-use lazy_static::lazy_static;
 use regex::Regex;
 use url::Url;
 
-lazy_static! {
-    /// Crunchbase url regular expression.
-    static ref CRUNCHBASE_URL: Regex =
-        Regex::new("^https://www.crunchbase.com/organization/(?P<permalink>[^/]+)/?$")
-            .expect("exprs in CRUNCHBASE_URL to be valid");
+/// Crunchbase url regular expression.
+pub(crate) static CRUNCHBASE_URL: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new("^https://www.crunchbase.com/organization/(?P<permalink>[^/]+)/?$")
+        .expect("exprs in CRUNCHBASE_URL to be valid")
+});
 
-    /// Regular expression to match multiple hyphens.
-    static ref MULTIPLE_HYPHENS: Regex = Regex::new(r"-{2,}").expect("exprs in MULTIPLE_HYPHENS to be valid");
+/// Regular expression to match multiple hyphens.
+pub(crate) static MULTIPLE_HYPHENS: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"-{2,}").expect("exprs in MULTIPLE_HYPHENS to be valid"));
 
     /// Characters allowed in normalized names.
     static ref VALID_CHARS: Regex = Regex::new(r#"[a-zA-Z0-9\-_\u{4e00}-\u{9fa5}]"#).expect("exprs in VALID_CHARS to be valid");
